@@ -11,6 +11,7 @@ import { useDropzone } from "react-dropzone";
 import { EncryptionTutorial } from "@/components/EncryptionTutorial";
 import { useLicenseKeys } from "@/hooks/useLicenseKeys";
 import { useProfile } from "@/hooks/useProfile";
+import { useActivityLogger } from "@/hooks/useActivityLogger";
 import { supabase } from "@/integrations/supabase/client";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -28,6 +29,7 @@ const Encrypt = () => {
 
   const { keys } = useLicenseKeys();
   const { data: profile } = useProfile();
+  const { logActivity } = useActivityLogger();
 
   const activeKeys = keys?.filter(k => k.status === 'active') || [];
 
@@ -62,10 +64,25 @@ const Encrypt = () => {
       toast.error("Adicione um arquivo");
       return;
     }
+
+    // Check if user has at least one active key
+    if (activeKeys.length === 0) {
+      toast.error("Você precisa criar pelo menos uma chave de licença antes de criptografar");
+      return;
+    }
+
     if (!licenseKeyId) {
       toast.error("Selecione uma chave de licença");
       return;
     }
+
+    // Check key usage limit
+    const selectedKey = activeKeys.find(k => k.id === licenseKeyId);
+    if (selectedKey && selectedKey.scripts_count >= 3) {
+      toast.error("Esta chave atingiu o limite de uso (3 criptografias). Crie uma nova chave.");
+      return;
+    }
+
     if (!customName.trim()) {
       toast.error("Digite um nome para identificar esta criptografia");
       return;
@@ -88,6 +105,14 @@ const Encrypt = () => {
 
     setProcessing(true);
     setShowTutorial(true);
+
+    // Log encryption start
+    await logActivity({
+      action: 'INICIO_CRIPTOGRAFIA',
+      itemName: customName.trim(),
+      status: 'pending',
+      details: `File: ${file.name}, Protection: ${protectionLevel}`,
+    });
 
     try {
       const fileContent = await file.text();
@@ -327,8 +352,8 @@ const Encrypt = () => {
                           </SelectItem>
                         ) : (
                           activeKeys.map((key) => (
-                            <SelectItem key={key.id} value={key.id}>
-                              {key.key_name} ({key.scripts_count} scripts)
+                            <SelectItem key={key.id} value={key.id} disabled={key.scripts_count >= 3}>
+                              {key.key_name} ({key.scripts_count >= 3 ? 'Limite atingido' : `${3 - key.scripts_count} usos restantes`})
                             </SelectItem>
                           ))
                         )}

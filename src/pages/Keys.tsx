@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Key, Copy, CheckCircle2, XCircle, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useActivityLogger } from "@/hooks/useActivityLogger";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ const Keys = () => {
   const [loading, setLoading] = useState(true);
   const [newKeyName, setNewKeyName] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { logActivity } = useActivityLogger();
 
   useEffect(() => {
     fetchKeys();
@@ -53,6 +55,27 @@ const Keys = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    // Get user profile to check plan limits
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", user.id)
+      .single();
+
+    // Check active keys count
+    const activeKeysCount = keys.filter(k => k.status === 'active').length;
+
+    // Apply plan limits
+    let maxKeys = 0;
+    if (profile?.plan === 'trial') maxKeys = 1;
+    else if (profile?.plan === 'basic') maxKeys = 10;
+    else if (profile?.plan === 'infinite') maxKeys = Infinity;
+
+    if (activeKeysCount >= maxKeys) {
+      toast.error(`Limite de chaves atingido. Seu plano permite até ${maxKeys} chave(s) ativa(s).`);
+      return;
+    }
+
     const { error } = await supabase
       .from("license_keys")
       .insert({
@@ -62,8 +85,19 @@ const Keys = () => {
 
     if (error) {
       toast.error("Erro ao criar chave");
+      await logActivity({
+        action: 'GERACAO_KEY',
+        itemName: newKeyName,
+        status: 'failed',
+        details: error.message,
+      });
     } else {
       toast.success("Chave criada com sucesso!");
+      await logActivity({
+        action: 'GERACAO_KEY',
+        itemName: newKeyName,
+        status: 'success',
+      });
       setNewKeyName("");
       setDialogOpen(false);
       fetchKeys();
@@ -77,6 +111,7 @@ const Keys = () => {
 
   const toggleKeyStatus = async (keyId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    const key = keys.find(k => k.id === keyId);
     
     const { error } = await supabase
       .from("license_keys")
@@ -86,7 +121,17 @@ const Keys = () => {
     if (error) {
       toast.error("Erro ao atualizar status");
     } else {
-      toast.success(`Chave ${newStatus === 'active' ? 'ativada' : 'desativada'}!`);
+      const statusText = newStatus === 'active' ? 'ativada' : 'desativada';
+      toast.success(`Chave ${statusText}!`);
+      
+      if (newStatus === 'inactive') {
+        await logActivity({
+          action: 'REVOGACAO_KEY',
+          itemName: key?.key_name || 'Key',
+          status: 'success',
+        });
+      }
+      
       fetchKeys();
     }
   };
@@ -189,6 +234,10 @@ const Keys = () => {
 
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span>Scripts vinculados: {key.scripts_count}</span>
+                      <span>•</span>
+                      <span className={key.scripts_count >= 3 ? 'text-destructive font-bold' : ''}>
+                        Usos Restantes: {Math.max(0, 3 - key.scripts_count)}/3
+                      </span>
                       <span>•</span>
                       <span>Criada em: {new Date(key.created_at).toLocaleDateString()}</span>
                     </div>

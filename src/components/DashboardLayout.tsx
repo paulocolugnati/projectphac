@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useProfile } from "@/hooks/useProfile";
 import { Separator } from "@/components/ui/separator";
 
 interface DashboardLayoutProps {
@@ -24,22 +25,7 @@ interface DashboardLayoutProps {
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [profile, setProfile] = useState<any>(null);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-        setProfile(data);
-      }
-    };
-    fetchProfile();
-  }, []);
+  const { data: profile } = useProfile();
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -158,7 +144,9 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <header className="h-16 border-b border-border flex items-center justify-between px-6 glass-strong sticky top-0 z-50">
           <div className="flex items-center gap-3">
             <div className="h-2 w-2 rounded-full bg-success animate-pulse-glow"></div>
-            <span className="text-sm font-medium text-muted-foreground">Sistema Operacional</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              PhacProtect - {profile?.company_name || 'Carregando...'}
+            </span>
           </div>
           
           <div className="flex items-center gap-4">

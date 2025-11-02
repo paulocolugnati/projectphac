@@ -57,7 +57,7 @@ serve(async (req) => {
       });
     }
 
-    // Get license key
+    // Get license key and check usage limit
     const { data: licenseKey } = await supabaseClient
       .from('license_keys')
       .select('*')
@@ -67,6 +67,14 @@ serve(async (req) => {
 
     if (!licenseKey || licenseKey.status !== 'active') {
       return new Response(JSON.stringify({ error: 'Invalid or inactive license key' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check key usage limit (max 3 uses)
+    if (licenseKey.scripts_count >= 3) {
+      return new Response(JSON.stringify({ error: 'Key usage limit reached (max 3 encryptions per key)' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -153,11 +161,11 @@ load(atob(decrypted))()`;
       .from('activity_logs')
       .insert({
         user_id: user.id,
-        action: 'encrypt',
+        action: 'CRIPTOGRAFIA_CONCLUIDA',
         item_name: customName || fileName,
-        status: 'completed',
+        status: 'success',
         credits_used: creditsNeeded,
-        details: `Protection: ${protectionLevel}`,
+        details: `Protection: ${protectionLevel}, Key: ${licenseKey.key_name}`,
       });
 
     console.log('Encryption completed successfully');
@@ -176,6 +184,36 @@ load(atob(decrypted))()`;
     );
   } catch (error) {
     console.error('Encryption error:', error);
+    
+    // Log failed activity
+    try {
+      const supabaseClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? '',
+        {
+          global: {
+            headers: { Authorization: req.headers.get('Authorization')! },
+          },
+        }
+      );
+      
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        await supabaseClient
+          .from('activity_logs')
+          .insert({
+            user_id: user.id,
+            action: 'CRIPTOGRAFIA_CONCLUIDA',
+            item_name: 'Encryption Failed',
+            status: 'failed',
+            credits_used: 0,
+            details: error instanceof Error ? error.message : 'Unknown error',
+          });
+      }
+    } catch (logError) {
+      console.error('Failed to log error:', logError);
+    }
+    
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       {

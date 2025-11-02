@@ -27,7 +27,7 @@ const Home = () => {
               <div className="flex flex-wrap gap-4">
                 <Link to="/signup">
                   <Button size="lg" className="text-lg px-8 py-6 h-auto bg-accent hover:bg-accent/90 text-white">
-                    Começar Agora
+                    ASSINAR PLANO INICIAL (GRÁTIS) →
                   </Button>
                 </Link>
                 <Link to="/login">
@@ -118,7 +118,7 @@ const Home = () => {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-border">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2025 PhacProtect. Todos os direitos reservados.</p>
+          <p>&copy; 2025 PhacStore. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>
