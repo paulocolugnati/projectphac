@@ -7,44 +7,44 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 const faqs = [
   {
-    question: "Como funciona a criptografia do PhacProtect?",
-    answer: "O PhacProtect utiliza ofuscação de bytecode Lua combinada com criptografia AES vinculada à sua chave de licença única. Isso garante que apenas servidores autorizados possam executar seus scripts."
+    question: "O que é Criptografia Bytecode LUA?",
+    answer: "É o processo de converter seu código-fonte em um formato binário ilegível antes de aplicar camadas de ofuscação e bind de licença, tornando a desofuscação extremamente difícil."
   },
   {
-    question: "Quanto tempo meus arquivos ficam armazenados?",
-    answer: "O tempo de armazenamento depende do seu plano: Plano INICIAL (24 horas), Plano Básico (72 horas) e Plano Infinite (permanente)."
+    question: "Como faço o loader funcionar no meu fxmanifest.lua?",
+    answer: "Copie e cole o código do Loader/Injector no topo do seu fxmanifest.lua e certifique-se de que o script criptografado está na pasta do recurso."
   },
   {
-    question: "O que são créditos e como funcionam?",
-    answer: "Créditos são usados para realizar operações: Criptografia (4 créditos) e Análise de Vulnerabilidade (2 créditos). O Plano Infinite oferece créditos ilimitados (∞)."
+    question: "Meu arquivo ZIP está corrompido, o que faço?",
+    answer: "Se a cópia do código funcionar, o problema é local. Tente desabilitar o firewall temporariamente ou use o download individual dos arquivos."
   },
   {
-    question: "Como gero uma chave de licença?",
-    answer: "Vá até a página 'Gerenciar Chaves', clique em 'Nova Chave', dê um nome e confirme. A chave será gerada automaticamente e poderá ser usada nas suas criptografias."
+    question: "Como funciona o BIND da Chave de Licença?",
+    answer: "A sua chave (Key) é criptografada dentro do script. Ele só será executado no servidor cuja chave corresponda à chave embutida, protegendo contra vazamentos para outros servidores."
   },
   {
-    question: "Posso revogar uma chave de licença?",
-    answer: "Sim! Na página 'Gerenciar Chaves', clique no botão de opções ao lado da chave e selecione 'Revogar'. Isso impedirá que scripts vinculados a essa chave funcionem."
+    question: "Por que meus dados são excluídos após 72 horas?",
+    answer: "É uma política de segurança rigorosa para garantir que seu código-fonte nunca permaneça armazenado em nossos servidores por muito tempo, protegendo sua privacidade."
   },
   {
-    question: "Como instalo o script criptografado no meu servidor?",
-    answer: "Após a criptografia, copie o código do loader fornecido e substitua o conteúdo do seu arquivo original. Não esqueça de atualizar o fxmanifest.lua conforme as instruções."
+    question: "Qual a diferença entre o Plano Inicial e o Básico?",
+    answer: "O Plano Básico oferece 40 Créditos/mês e a capacidade de criar 10 Chaves de Licença, enquanto o Plano Inicial é limitado a 1 Chave e 10 Créditos."
   },
   {
-    question: "Qual a diferença entre os níveis de proteção?",
-    answer: "Planos INICIAL e Básico oferecem proteção padrão. O Plano Infinite dá acesso aos Níveis Avançados com camadas extras de segurança e anti-debugging."
+    question: "Posso mudar o nome do meu script após a criptografia?",
+    answer: "Sim, o arquivo criptografado mantém o nome original. Você deve garantir que o arquivo ofuscado substitua o original na sua pasta."
   },
   {
-    question: "A criptografia afeta a performance do script?",
-    answer: "Não! O PhacProtect foi projetado para ter impacto zero na velocidade de execução dos seus scripts."
+    question: "O que é a Análise de Vulnerabilidade e por que devo usá-la?",
+    answer: "É um scan que verifica seu código antes da criptografia em busca de comandos perigosos ou variáveis que possam ser exploradas por hackers."
   },
   {
-    question: "O que acontece se meus créditos acabarem?",
-    answer: "Você precisará fazer upgrade do plano ou aguardar a renovação mensal (exceto Plano INICIAL). Seus scripts já criptografados continuarão funcionando normalmente."
+    question: "Como faço para revogar uma chave de licença?",
+    answer: "Vá em Gerenciamento de Keys, clique na chave e selecione 'Revogar'. O script vinculado a essa chave deixará de funcionar imediatamente no servidor de jogo."
   },
   {
-    question: "Como funciona a análise de vulnerabilidade?",
-    answer: "Nossa IA analisa seu código em busca de falhas de segurança comuns (SQL injection, credenciais expostas, etc.) e fornece sugestões de correção."
+    question: "Posso alterar meu Nome/Empresa mais de uma vez?",
+    answer: "Não. Para fins de segurança e integridade de licença, a alteração é limitada a apenas uma vez."
   }
 ];
 
@@ -71,26 +71,40 @@ export const HelpCenter = () => {
               <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-smooth" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-2xl">
-                <HelpCircle className="h-6 w-6 text-accent" />
-                Perguntas Frequentes
+          <DialogContent className="glass-strong max-w-4xl max-h-[85vh] overflow-y-auto border-primary/20">
+            <DialogHeader className="space-y-3">
+              <DialogTitle className="flex items-center gap-3 text-3xl">
+                <HelpCircle className="h-8 w-8 text-primary" />
+                Central de Ajuda - FAQs
               </DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                Encontre respostas rápidas para as dúvidas mais comuns sobre o PhacProtect
+              </p>
             </DialogHeader>
             
-            <Accordion type="single" collapsible className="w-full">
-              {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+            <div className="mt-6">
+              <Accordion type="single" collapsible className="w-full space-y-3">
+                {faqs.map((faq, index) => (
+                  <AccordionItem 
+                    key={index} 
+                    value={`item-${index}`}
+                    className="glass border-primary/10 rounded-lg px-4"
+                  >
+                    <AccordionTrigger className="text-left hover:text-primary transition-smooth py-4">
+                      <div className="flex items-start gap-3">
+                        <span className="text-primary font-bold text-sm mt-0.5">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="font-semibold">{faq.question}</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pt-2 pb-4 pl-9">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
           </DialogContent>
         </Dialog>
       </CardContent>

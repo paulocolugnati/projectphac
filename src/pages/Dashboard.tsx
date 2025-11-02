@@ -2,10 +2,11 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Shield, Lock, Key, AlertCircle, ArrowRight, TrendingUp, HelpCircle, MessageSquare, Mail, Book, ExternalLink } from "lucide-react";
+import { Shield, Lock, Key, AlertCircle, ArrowRight, TrendingUp, Mail, Book, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { HelpCenter } from "@/components/HelpCenter";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -280,96 +281,74 @@ const Dashboard = () => {
         </div>
 
         {/* Central de Ajuda */}
-        <Card className="glass-strong border-primary/10">
-          <div className="p-8 space-y-6">
-            <div className="flex items-center gap-3">
-              <HelpCircle className="h-6 w-6 text-primary" />
-              <h2 className="text-2xl font-bold">Central de Ajuda</h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Perguntas Frequentes */}
-              <Card className="glass border-primary/10 hover:border-primary/20 transition-smooth">
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <MessageSquare className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-bold">Perguntas Frequentes</h3>
-                  </div>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <p>• Como funciona a criptografia?</p>
-                    <p>• O que são chaves de licença?</p>
-                    <p>• Como analisar vulnerabilidades?</p>
-                    <p>• Política de 72 horas de histórico</p>
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Ver Todas as FAQs
-                  </Button>
-                </div>
-              </Card>
-
-              {/* Suporte Técnico */}
-              <Card className="glass border-primary/10 hover:border-primary/20 transition-smooth">
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Mail className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-bold">Suporte Técnico</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Precisa de ajuda? Nossa equipe está pronta para auxiliar você.
-                  </p>
-                  <Button variant="default" size="sm" className="w-full bg-primary hover:bg-primary/90">
-                    Abrir Chamado
-                  </Button>
-                </div>
-              </Card>
-
-              {/* Documentação */}
-              <Card className="glass border-primary/10 hover:border-primary/20 transition-smooth">
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Book className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-bold">Documentação</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Guias completos e tutoriais para usar o PhacProtect.
-                  </p>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Acessar Docs
-                  </Button>
-                </div>
-              </Card>
-
-              {/* Links Rápidos */}
-              <Card className="glass border-primary/10 hover:border-primary/20 transition-smooth">
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <ExternalLink className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-bold">Links Rápidos</h3>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <a href="#" className="block text-muted-foreground hover:text-primary transition-smooth">
-                      → Termos de Serviço
-                    </a>
-                    <a href="#" className="block text-muted-foreground hover:text-primary transition-smooth">
-                      → Política de Privacidade
-                    </a>
-                    <a href="#" className="block text-muted-foreground hover:text-primary transition-smooth">
-                      → Status do Sistema
-                    </a>
-                  </div>
-                </div>
-              </Card>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Component de FAQs */}
+          <div className="lg:col-span-2">
+            <HelpCenter />
           </div>
-        </Card>
+
+          {/* Recursos Adicionais */}
+          <div className="space-y-4">
+            {/* Suporte Técnico */}
+            <Card className="glass-strong border-primary/10 hover:border-primary/20 transition-smooth">
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Mail className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold">Suporte Técnico</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Precisa de ajuda? Nossa equipe está pronta para auxiliar você.
+                </p>
+                <Button variant="default" size="sm" className="w-full bg-primary hover:bg-primary/90">
+                  Abrir Chamado
+                </Button>
+              </div>
+            </Card>
+
+            {/* Documentação */}
+            <Card className="glass-strong border-primary/10 hover:border-primary/20 transition-smooth">
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Book className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold">Documentação</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Guias completos e tutoriais para usar o PhacProtect.
+                </p>
+                <Button variant="outline" size="sm" className="w-full">
+                  Acessar Docs
+                </Button>
+              </div>
+            </Card>
+
+            {/* Links Rápidos */}
+            <Card className="glass-strong border-primary/10 hover:border-primary/20 transition-smooth">
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <ExternalLink className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold">Links Rápidos</h3>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <a href="#" className="block text-muted-foreground hover:text-primary transition-smooth">
+                    → Termos de Serviço
+                  </a>
+                  <a href="#" className="block text-muted-foreground hover:text-primary transition-smooth">
+                    → Política de Privacidade
+                  </a>
+                  <a href="#" className="block text-muted-foreground hover:text-primary transition-smooth">
+                    → Status do Sistema
+                  </a>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );
